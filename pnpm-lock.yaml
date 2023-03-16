@@ -1,9 +1,15 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@types': link:lodash/@types
+  lodash: ^4.17.21
   prettier: ^2.8.4
   typescript: ^5.0.2
   vitest: ^0.29.3
+
+dependencies:
+  '@types': link:lodash/@types
+  lodash: 4.17.21
 
 devDependencies:
   prettier: 2.8.4
@@ -424,6 +430,10 @@ packages:
     resolution: {integrity: sha512-SFppqq5p42fe2qcZQqqEOiVRXl+WCP1MdT6k7BDEW1j++sp5fIY+/fdRQitvKgB5BrBcmrs5m/L0v2FrU5MY1g==}
     engines: {node: '>=14'}
     dev: true
+
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: false
 
   /loupe/2.3.6:
     resolution: {integrity: sha512-RaPMZKiMy8/JruncMU5Bt6na1eftNoo++R4Y+N2FrxkDVTrGvcyzFTsaGif4QTeKESheMGegbhw6iUAq+5A8zA==}

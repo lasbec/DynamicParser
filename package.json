@@ -7,5 +7,9 @@
 	"scripts": {
 		"test": "npx vitest ./test",
 		"build": "npx tsc"
+	},
+	"dependencies": {
+		"@types": "link:lodash/@types",
+		"lodash": "^4.17.21"
 	}
 }
