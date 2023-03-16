@@ -1,0 +1,8 @@
+{
+    "[typescript]": {
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true,
+    },
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": false,
+}
