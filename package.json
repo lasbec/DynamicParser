@@ -1,0 +1,9 @@
+{
+	"devDependencies": {
+		"typescript": "^5.0.2"
+	},
+	"scripts": {
+		"test": "npx vitest /test",
+		"build": "npx tsc"
+	}
+}
