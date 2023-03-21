@@ -1,12 +1,26 @@
 import { range } from "lodash";
 
 type UnboundProduction<R extends string> = (string | UnboundRule<R>)[];
-
 type UnboundGrammar<R extends string> = Record<R, UnboundProduction<R>[]>;
 
 export type UnboundRule<R extends string> = { rule: R };
 export function R<R extends string>(name: R): UnboundRule<R> {
   return { rule: name };
+}
+function isInt(x: unknown): x is number {
+  return Number.isInteger(x);
+}
+
+type Char = string & { length: 1 };
+function isChar(c: string): c is Char {
+  return c.length === 1;
+}
+function assertChar(c: string): asserts c is Char {
+  if (!isChar(c)) throw new Error(`Expected '${c}' to be single character.`);
+}
+function asChar(c: string): Char {
+  assertChar(c);
+  return c;
 }
 
 function buildDynamicParser<R extends string>(
@@ -81,10 +95,7 @@ function buildDynamicParser<R extends string>(
       return this.get(this.pointer) as Rule | string;
     }
 
-    jumpingTable(): JumpingTable {
-      const symb = this.next;
-      JumpingTable.construct();
-    }
+    pathToNext(): [Rule[], string] {}
 
     private static stringFormSeparator = "\t";
 
@@ -115,23 +126,29 @@ function buildDynamicParser<R extends string>(
     }
   }
 
-  function isInt(x: unknown): x is number {
-    return Number.isInteger(x);
-  }
-
-  class ParserState<R extends string> {
-    constructor(readonly possibleHypothesis: Array<ProductionHypothesis>) {}
+  class ParserState {
+    private constructor(
+      readonly possibleHypothesis: Array<ProductionHypothesis>
+    ) {}
     private static stringFormSeparator = "\n";
+    private static stringFormEnding = "$$25";
 
-    toString() {
-      return this.possibleHypothesis
-        .map((x) => x.toString())
-        .join(ParserState.stringFormSeparator);
+    static empty(): ParserState {
+      return new ParserState([]);
     }
 
-    static fromString<R extends string>(str: string): ParserState<R> {
+    toString() {
+      return (
+        this.possibleHypothesis
+          .map((x) => x.toString())
+          .join(ParserState.stringFormSeparator) + ParserState.stringFormEnding
+      );
+    }
+
+    static fromString<R extends string>(str: string): ParserState {
       return new ParserState(
         str
+          .slice(ParserState.stringFormEnding.length)
           .split(ParserState.stringFormSeparator)
           .map(ProductionHypothesis.fromString)
       );
@@ -139,9 +156,23 @@ function buildDynamicParser<R extends string>(
   }
 
   class JumpingTable {
-    private constructor(readonly mapping: Map<[string, string], string>) {}
-    static construct<() {
+    private constructor(
+      readonly mapping: Map<string, [string, Rule | undefined]>
+    ) {}
+    static construct() {
       return new JumpingTable(new Map());
+    }
+
+    parsePath(str: string, state: string) {
+      const result: Rule[] = [];
+      for (const char of str) {
+        const next = this.mapping.get(state + char);
+        if (!next) throw new Error(`Unexpected char '${char}'.`);
+        const [newState, rule] = next;
+        if (rule) result.push(rule);
+        state = newState;
+      }
+      return result;
     }
   }
 }
