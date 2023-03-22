@@ -1,6 +1,6 @@
-import { Table } from "./Table";
+import { Table } from "./Level1Layer/Table";
 import { EOF, Grammar, MetaSymbol, Terminal } from "./Grammar";
-import { charAt } from "./Char";
+import { charAt } from "./Level0Layer/Char";
 
 export class ShiftReduceMachine {
   constructor(

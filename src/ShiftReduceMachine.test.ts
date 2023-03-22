@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Table } from "./Table";
+import { Table } from "./Level1Layer/Table";
 import {
   Action,
   ShiftReduceMachine,
@@ -7,7 +7,7 @@ import {
   reduce,
   shift,
 } from "./ShiftReduceMachine";
-import { Char } from "./Char";
+import { Char } from "./Level0Layer/Char";
 import { EOF, Terminal } from "./Grammar";
 
 /*

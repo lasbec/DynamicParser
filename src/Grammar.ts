@@ -1,5 +1,5 @@
-import { getRandomInt } from "./Basics";
-import { Char } from "./Char";
+import { getRandomInt } from "./Level0Layer/Basics";
+import { Char } from "./Level0Layer/Char";
 
 export const EOF = Symbol("End Of File");
 export type EOF = typeof EOF;

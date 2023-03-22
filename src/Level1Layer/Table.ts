@@ -1,5 +1,5 @@
 import { R } from "vitest/dist/types-5872e574";
-import { Primitive } from "./Basics";
+import { Primitive } from "../Level0Layer/Basics";
 
 export class Table<
   Entry,
