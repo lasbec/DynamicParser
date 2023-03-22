@@ -32,11 +32,19 @@ class ShiftReduceExecution extends ShiftReduceMachine {
   private input: string = "";
   private state: number | Result = 0;
   private stack: [Terminal | MetaSymbol, number][] = [[EOF, 0]];
+  private charCounter = 0;
+  private lineCounter = 0;
 
   private init(input: string) {
     this.input = input;
     this.state = 0;
     this.stack = [[EOF, 0]];
+    this.charCounter = 0;
+    this.lineCounter = 0;
+  }
+
+  private positionDescription(): string {
+    return `[line: ${this.lineCounter}, char: ${this.charCounter}]`;
   }
 
   private peekStack() {
@@ -46,9 +54,18 @@ class ShiftReduceExecution extends ShiftReduceMachine {
   private peekChar(): Terminal {
     return charAt(this.input, 0) || EOF;
   }
+
   private consumeChar(): Terminal {
     const result = this.peekChar();
     this.input = this.input.slice(1);
+    if (result === "\n") {
+      this.charCounter = 0;
+      this.lineCounter += 1;
+      // On windows lineendings we need to await till
+      // carriage return is over till we keep on counting characters.
+    } else if (result !== "\r") {
+      this.charCounter += 1;
+    }
     return result;
   }
 
@@ -64,7 +81,7 @@ class ShiftReduceExecution extends ShiftReduceMachine {
         this.accept();
         break;
       case "reject":
-        this.reject(action.reason);
+        this.reject(`${this.positionDescription()} ${action.reason}`);
         break;
     }
   }
@@ -85,7 +102,7 @@ class ShiftReduceExecution extends ShiftReduceMachine {
     const newState = this.jumpingTable.get(production.metaSymbol, readState);
     if (!newState) {
       this.reject(
-        `No state transtion in jumbing table found for '${production.metaSymbol.toString()}' and '${readState}'`
+        `${this.positionDescription()} No state transtion in jumbing table found for '${production.metaSymbol.toString()}' and '${readState}'`
       );
       return;
     }
@@ -108,7 +125,7 @@ class ShiftReduceExecution extends ShiftReduceMachine {
       const action =
         this.actions.get(char, this.state) ||
         reject(
-          `No transition for ${char.toString()} and ${
+          `${this.positionDescription()} No transition for ${char.toString()} and ${
             this.state
           } found in action table.`
         );
