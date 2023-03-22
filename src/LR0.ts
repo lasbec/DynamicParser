@@ -1,5 +1,4 @@
-import { Production, Element } from "./Grammar";
-import { MetaSymbol } from "./MetaSymbol";
+import { MetaSymbol, Production, Element } from "./Grammar";
 
 function metaSymbolToString(symbol: MetaSymbol): boolean {
   return symbol === Symbol("itren");

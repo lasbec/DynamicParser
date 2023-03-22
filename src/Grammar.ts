@@ -5,8 +5,9 @@ export const EOF = Symbol("End Of File");
 export type EOF = typeof EOF;
 
 export type Terminal = Char | EOF;
-export type Grammar = ReadonlyArray<Production>;
 export type MetaSymbol = symbol;
+export type Element = Terminal | MetaSymbol;
+export type Grammar = ReadonlyArray<Production>;
 export type Production = {
   readonly metaSymbol: MetaSymbol;
   readonly result: ReadonlyArray<Terminal | MetaSymbol>;
@@ -34,8 +35,6 @@ function getMetaSymbols(grammar: Grammar): Set<MetaSymbol> {
 function isMetaSymbol(str: string, grammar: Grammar): boolean {
   return getMetaSymbols(grammar).has(Symbol(str));
 }
-
-type Element = Terminal | MetaSymbol;
 
 function randomStep(state: Element[], grammar: Grammar): Element[] {
   const metaSymbolIndex = state.findIndex((e) => typeof e !== "string");
