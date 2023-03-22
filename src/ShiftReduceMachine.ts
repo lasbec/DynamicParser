@@ -2,6 +2,15 @@ import { Table } from "./Level1Layer/Table";
 import { EOF, Grammar, MetaSymbol, Terminal } from "./Grammar";
 import { charAt } from "./Level0Layer/Char";
 
+type Result =
+  | {
+      inLanguage: true;
+    }
+  | {
+      inLanguage: false;
+      reason: string;
+    };
+
 export class ShiftReduceMachine {
   constructor(
     readonly actions: Table<Action, Terminal>,
@@ -9,7 +18,7 @@ export class ShiftReduceMachine {
     readonly grammar: Grammar
   ) {}
 
-  run(input: string): "accept" | "reject" {
+  run(input: string): Result {
     const execution = new ShiftReduceExecution(
       this.actions,
       this.jumpingTable,
@@ -21,7 +30,7 @@ export class ShiftReduceMachine {
 
 class ShiftReduceExecution extends ShiftReduceMachine {
   private input: string = "";
-  private state: number | "accept" | "reject" = 0;
+  private state: number | Result = 0;
   private stack: [Terminal | MetaSymbol, number][] = [[EOF, 0]];
 
   private init(input: string) {
@@ -55,7 +64,7 @@ class ShiftReduceExecution extends ShiftReduceMachine {
         this.accept();
         break;
       case "reject":
-        this.reject();
+        this.reject(action.reason);
         break;
     }
   }
@@ -75,7 +84,9 @@ class ShiftReduceExecution extends ShiftReduceMachine {
     const readState = top[1];
     const newState = this.jumpingTable.get(production.metaSymbol, readState);
     if (!newState) {
-      this.reject();
+      this.reject(
+        `No state transtion in jumbing table found for '${production.metaSymbol.toString()}' and '${readState}'`
+      );
       return;
     }
     this.state = newState;
@@ -83,18 +94,24 @@ class ShiftReduceExecution extends ShiftReduceMachine {
   }
 
   private accept() {
-    this.state = "accept";
+    this.state = { inLanguage: true };
   }
 
-  private reject() {
-    this.state = "reject";
+  private reject(reason: string) {
+    this.state = { inLanguage: false, reason };
   }
 
-  run(input: string): "accept" | "reject" {
+  run(input: string): Result {
     this.input = input;
-    while (typeof this.state !== "string") {
+    while (typeof this.state === "number") {
       const char = this.peekChar();
-      const action = this.actions.get(char, this.state) || reject();
+      const action =
+        this.actions.get(char, this.state) ||
+        reject(
+          `No transition for ${char.toString()} and ${
+            this.state
+          } found in action table.`
+        );
       this.execute(action);
     }
     return this.state;
@@ -111,7 +128,11 @@ export type Action =
       readonly ruleIndex: number;
     }
   | {
-      readonly type: "accept" | "reject";
+      readonly type: "accept";
+    }
+  | {
+      readonly type: "reject";
+      readonly reason: string;
     };
 
 export function shift(nextState: number): Action {
@@ -133,8 +154,9 @@ export function accept(): Action {
     type: "accept",
   };
 }
-export function reject(): Action {
+export function reject(reason: string): Action {
   return {
     type: "reject",
+    reason,
   };
 }

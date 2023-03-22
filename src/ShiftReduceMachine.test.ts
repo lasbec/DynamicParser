@@ -74,7 +74,7 @@ describe("ByScript", () => {
     const wordsToExecpt = ["baab", "baabb"];
     for (const word of wordsToExecpt) {
       it(word, () => {
-        if (srm.run(word) !== "accept") {
+        if (!srm.run(word).inLanguage) {
           expect(word).toEqual({ toBe: "accepted" });
         }
       });
@@ -83,7 +83,7 @@ describe("ByScript", () => {
     const wordsToRejected = ["xyb", "", "babab", "babaacab"];
     for (const word of wordsToRejected) {
       it(word, () => {
-        if (srm.run(word) !== "reject") {
+        if (srm.run(word).inLanguage) {
           expect(word).toEqual({ toBe: "reject" });
         }
       });
