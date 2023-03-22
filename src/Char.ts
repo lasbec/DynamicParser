@@ -14,6 +14,6 @@ export function Char(str: string): Char {
   return str;
 }
 
-export function at(str: string, index: number) {
+export function charAt(str: string, index: number) {
   return str.at(index) as Char | undefined;
 }

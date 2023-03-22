@@ -1,6 +1,6 @@
 import { Table } from "./Table";
-import { Grammar, MetaSymbol } from "./Grammar";
-import { Char, at as charAt } from "./Char";
+import { EOF, Grammar, MetaSymbol, Terminal } from "./Grammar";
+import { charAt } from "./Char";
 
 export class ShiftReduceMachine {
   constructor(
@@ -138,8 +138,3 @@ export function reject(): Action {
     type: "reject",
   };
 }
-
-export type Terminal = Char | EOF;
-
-export const EOF = Symbol("End Of File");
-export type EOF = typeof EOF;

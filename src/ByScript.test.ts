@@ -2,14 +2,13 @@ import { describe, expect, it } from "vitest";
 import { Table } from "./Table";
 import {
   Action,
-  EOF,
   ShiftReduceMachine,
-  Terminal,
   accept,
   reduce,
   shift,
 } from "./ShiftReduceMachine";
 import { Char } from "./Char";
+import { EOF, Terminal } from "./Grammar";
 
 /*
  * Example Grammar:

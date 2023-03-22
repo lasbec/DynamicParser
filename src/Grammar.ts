@@ -1,5 +1,10 @@
 import { getRandomInt } from "./Basics";
+import { Char } from "./Char";
 
+export const EOF = Symbol("End Of File");
+export type EOF = typeof EOF;
+
+export type Terminal = Char | EOF;
 export type Grammar = ReadonlyArray<Production>;
 export type MetaSymbol = string;
 export type Production = {
