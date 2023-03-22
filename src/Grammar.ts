@@ -6,40 +6,36 @@ export type EOF = typeof EOF;
 
 export type Terminal = Char | EOF;
 export type Grammar = ReadonlyArray<Production>;
-export type MetaSymbol = string;
+export type MetaSymbol = symbol;
 export type Production = {
-  readonly left: MetaSymbol;
-  readonly right: ReadonlyArray<string>;
+  readonly metaSymbol: MetaSymbol;
+  readonly result: ReadonlyArray<Terminal | MetaSymbol>;
 };
 
-function getRandomProduction(left: string, grammar: Grammar): Production {
-  const candidates = grammar.filter((p) => p.left === left);
+function getRandomProduction(left: MetaSymbol, grammar: Grammar): Production {
+  const candidates = grammar.filter((p) => p.metaSymbol === left);
   if (candidates.length === 0)
-    throw new Error(`No productions for '${left}' in grammar.`);
+    throw new Error(`No productions for '${String(left)}' in grammar.`);
   const index = getRandomInt(0, candidates.length - 1);
   const result = candidates[index];
   if (!result)
     throw new Error(
       `Invalid result! Candidates= [${candidates
-        .flatMap((c) => c.left + "::=" + c.right.join(""))
+        .flatMap((c) => c.metaSymbol.toString() + "::=" + c.result.join(""))
         .join(",")}]; index= ${index}.`
     );
   return result;
 }
 
-function getMetaSymbols(grammar: Grammar): Set<string> {
-  return new Set(grammar.map((p) => p.left));
+function getMetaSymbols(grammar: Grammar): Set<MetaSymbol> {
+  return new Set(grammar.map((p) => p.metaSymbol));
 }
 
 function isMetaSymbol(str: string, grammar: Grammar): boolean {
-  return getMetaSymbols(grammar).has(str);
+  return getMetaSymbols(grammar).has(Symbol(str));
 }
 
-type Element =
-  | string
-  | {
-      r: string;
-    };
+type Element = Terminal | MetaSymbol;
 
 function randomStep(state: Element[], grammar: Grammar): Element[] {
   const metaSymbolIndex = state.findIndex((e) => typeof e !== "string");
@@ -49,15 +45,13 @@ function randomStep(state: Element[], grammar: Grammar): Element[] {
 
   const rest = state.slice(metaSymbolIndex + 1);
 
-  const production = getRandomProduction(metaSymbol.r, grammar);
-  const metaSymbolReplacement = production.right.map((s) =>
-    isMetaSymbol(s, grammar) ? { r: s } : s
-  );
+  const production = getRandomProduction(metaSymbol, grammar);
+  const metaSymbolReplacement = production.result;
   return [...prev, ...metaSymbolReplacement, ...rest];
 }
 
 export function generateRandomWord(
-  state: { r: string },
+  state: MetaSymbol,
   grammar: Grammar
 ): string {
   let result: Element[] = [state];

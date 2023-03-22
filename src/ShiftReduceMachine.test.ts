@@ -53,18 +53,21 @@ describe("ByScript", () => {
       [EOF, reduce(1)],
     ]);
 
-  const jumpingTable = Table.empty<number>()
-    .set("A", 3, 4)
-    .set("S", 0, 1)
-    .set("S", 6, 7);
+  const A = Symbol("A");
+  const S = Symbol("S");
+  const Z = Symbol("Z");
+  const jumpingTable = Table.empty<number, symbol>()
+    .set(A, 3, 4)
+    .set(S, 0, 1)
+    .set(S, 6, 7);
 
   const grammar = [
-    { left: "Z", right: ["S"] },
-    { left: "S", right: ["S", "b"] },
-    { left: "S", right: ["b", "A", "a"] },
-    { left: "A", right: ["a", "S", "c"] },
-    { left: "A", right: ["a"] },
-    { left: "A", right: ["a", "S", "b"] },
+    { metaSymbol: Z, result: [S] },
+    { metaSymbol: S, result: [S, Char("b")] },
+    { metaSymbol: S, result: [Char("b"), A, Char("a")] },
+    { metaSymbol: A, result: [Char("a"), S, Char("c")] },
+    { metaSymbol: A, result: [Char("a")] },
+    { metaSymbol: A, result: [Char("a"), S, Char("b")] },
   ];
   const srm = new ShiftReduceMachine(actionTable, jumpingTable, grammar);
   describe("accept and reject words", () => {

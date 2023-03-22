@@ -5,7 +5,7 @@ import { charAt } from "./Level0Layer/Char";
 export class ShiftReduceMachine {
   constructor(
     readonly actions: Table<Action, Terminal>,
-    readonly jumpingTable: Table<number>,
+    readonly jumpingTable: Table<number, MetaSymbol>,
     readonly grammar: Grammar
   ) {}
 
@@ -22,12 +22,12 @@ export class ShiftReduceMachine {
 class ShiftReduceExecution extends ShiftReduceMachine {
   private input: string = "";
   private state: number | "accept" | "reject" = 0;
-  private stack: [Terminal | MetaSymbol, number][] = [["", 0]];
+  private stack: [Terminal | MetaSymbol, number][] = [[EOF, 0]];
 
   private init(input: string) {
     this.input = input;
     this.state = 0;
-    this.stack = [["", 0]];
+    this.stack = [[EOF, 0]];
   }
 
   private peekStack() {
@@ -69,17 +69,17 @@ class ShiftReduceExecution extends ShiftReduceMachine {
   private reduce(ruleIndex: number) {
     const production = this.grammar[ruleIndex];
     if (!production) throw new Error(`Invalid production index ${ruleIndex}`);
-    const l = production.right.length;
+    const l = production.result.length;
     this.stack.splice(-l);
     const top = this.peekStack();
     const readState = top[1];
-    const newState = this.jumpingTable.get(production.left, readState);
+    const newState = this.jumpingTable.get(production.metaSymbol, readState);
     if (!newState) {
       this.reject();
       return;
     }
     this.state = newState;
-    this.stack.push([production.left, newState]);
+    this.stack.push([production.metaSymbol, newState]);
   }
 
   private accept() {
