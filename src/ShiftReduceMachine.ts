@@ -1,5 +1,6 @@
 import { Table } from "./Table";
-import { Grammar } from "./Grammar";
+import { Grammar, MetaSymbol } from "./Grammar";
+import { Char, at as charAt } from "./Char";
 
 export class ShiftReduceMachine {
   constructor(
@@ -21,7 +22,7 @@ export class ShiftReduceMachine {
 class ShiftReduceExecution extends ShiftReduceMachine {
   private input: string = "";
   private state: number | "accept" | "reject" = 0;
-  private stack: [Terminal, number][] = [["", 0]];
+  private stack: [Terminal | MetaSymbol, number][] = [["", 0]];
 
   private init(input: string) {
     this.input = input;
@@ -34,7 +35,7 @@ class ShiftReduceExecution extends ShiftReduceMachine {
   }
 
   private peekChar(): Terminal {
-    return this.input[0] || EOF;
+    return charAt(this.input, 0) || EOF;
   }
   private consumeChar(): Terminal {
     const result = this.peekChar();
@@ -138,7 +139,7 @@ export function reject(): Action {
   };
 }
 
-export type Terminal = string | EOF;
+export type Terminal = Char | EOF;
 
 export const EOF = Symbol("End Of File");
 export type EOF = typeof EOF;

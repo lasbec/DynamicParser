@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { Table } from "./Table";
-import { Production } from "./Grammar";
 import {
   Action,
   EOF,
@@ -10,6 +9,7 @@ import {
   reduce,
   shift,
 } from "./ShiftReduceMachine";
+import { Char } from "./Char";
 
 /*
  * Example Grammar:
@@ -22,35 +22,35 @@ import {
  */
 describe("ByScript", () => {
   const actionTable = Table.empty<Action, Terminal>()
-    .setRow(0, [["b", shift(3)]])
+    .setRow(0, [[Char("b"), shift(3)]])
     .setRow(1, [
-      ["b", shift(2)],
+      [Char("b"), shift(2)],
       [EOF, accept()],
     ])
     .setRow(2, [
-      ["b", reduce(1)],
+      [Char("b"), reduce(1)],
       [EOF, reduce(1)],
     ])
-    .setRow(3, [["a", shift(6)]])
-    .setRow(4, [["a", shift(5)]])
+    .setRow(3, [[Char("a"), shift(6)]])
+    .setRow(4, [[Char("a"), shift(5)]])
     .setRow(5, [
-      ["b", reduce(2)],
-      ["c", reduce(2)],
+      [Char("b"), reduce(2)],
+      [Char("c"), reduce(2)],
       [EOF, reduce(2)],
     ])
     .setRow(6, [
-      ["a", reduce(4)],
-      ["b", shift(3)],
+      [Char("a"), reduce(4)],
+      [Char("b"), shift(3)],
     ])
     .setRow(7, [
-      ["b", shift(9)],
-      ["c", shift(8)],
+      [Char("b"), shift(9)],
+      [Char("c"), shift(8)],
     ])
-    .setRow(8, [["a", reduce(4)]])
+    .setRow(8, [[Char("a"), reduce(4)]])
     .setRow(9, [
-      ["a", reduce(5)],
-      ["b", reduce(1)],
-      ["c", reduce(1)],
+      [Char("a"), reduce(5)],
+      [Char("b"), reduce(1)],
+      [Char("c"), reduce(1)],
       [EOF, reduce(1)],
     ]);
 

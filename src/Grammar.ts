@@ -1,9 +1,9 @@
 import { getRandomInt } from "./Basics";
 
 export type Grammar = ReadonlyArray<Production>;
-
+export type MetaSymbol = string;
 export type Production = {
-  readonly left: string;
+  readonly left: MetaSymbol;
   readonly right: ReadonlyArray<string>;
 };
 
