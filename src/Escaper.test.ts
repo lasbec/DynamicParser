@@ -16,4 +16,8 @@ describe("Escaper", () => {
   it("should recognize unescaped string", () => {
     expect(e.isEscaped("ABC$$EFG <$>")).toEqual(false);
   });
+
+  it("0", () => {
+    expect(e.splitOnUnescaped("ABC$EFG <$$>")).toEqual(["ABC", "EFG <$$>"]);
+  });
 });
