@@ -18,8 +18,4 @@ export class LR0Element implements Production {
   rightFromPoint(): ReadonlyArray<Element> {
     return this.result.slice(this.pointIndex);
   }
-
-  toString() {
-    return [this.metaSymbol.toString(), ...this.result];
-  }
 }
