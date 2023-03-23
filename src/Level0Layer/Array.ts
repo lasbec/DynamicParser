@@ -41,6 +41,39 @@ export function sortArray<C extends Comparison<any, any>>(comp: C) {
   };
 }
 
+export function findBinary<C extends Comparison<any, any>>(comp: C) {
+  return (arr: SortedArray<C>) => {
+    return (element: GetComparisonType<C>): number | undefined => {
+      const resultRange: [number, number] = [0, arr.length - 1];
+      let middleIndex = Math.floor(resultRange[0] + resultRange[1] / 2);
+      while (resultRange[0] < resultRange[1]) {
+        middleIndex = Math.floor((resultRange[0] + resultRange[1]) / 2);
+        const comparison = comp.compare(arr[middleIndex], element);
+        if (comparison === "left=right") {
+          return middleIndex;
+        }
+        if (middleIndex === resultRange[0] || middleIndex === resultRange[1]) {
+          return;
+        }
+        if (comparison === "left<right") {
+          resultRange[0] = middleIndex;
+          continue;
+        }
+        if (comparison === "left>right") {
+          resultRange[1] = middleIndex;
+          continue;
+        }
+        throw new Error(
+          `Corrupt compare function for '${comp.id}' returned '${comparison}'.`
+        );
+      }
+      throw new Error(
+        `Corrupt serach state: left=${resultRange[0]}, right=${resultRange[1]}, middle=${middleIndex}`
+      );
+    };
+  };
+}
+
 export function DefaultAsc<T extends number | string | bigint>(): Comparison<
   T,
   "Default Ascending"
