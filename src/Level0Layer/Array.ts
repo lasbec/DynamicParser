@@ -41,16 +41,23 @@ export function sortArray<C extends Comparison<any, any>>(comp: C) {
   };
 }
 
-export const NumAsc = {
-  compare(left: number, right: number) {
-    if (left < right) {
-      return "left<right";
-    }
-    if (left > right) {
-      return "left>right";
-    }
-    return "left=right";
-  },
-  id: "Numeral value ascending",
-} as const;
-export type NumAsc = typeof NumAsc;
+export function DefaultAsc<T extends number | string | bigint>(): Comparison<
+  T,
+  "Default Ascending"
+> {
+  return {
+    compare(left: T, right: T) {
+      if (left < right) {
+        return "left<right";
+      }
+      if (left > right) {
+        return "left>right";
+      }
+      return "left=right";
+    },
+    id: "Default Ascending",
+  };
+}
+export type DefaultAsc<
+  T extends number | string | bigint = number | string | bigint
+> = Comparison<T, "Default Ascending">;
