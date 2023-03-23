@@ -12,7 +12,25 @@ export type MutJsonArray = Array<MutJson | JsonPrimitive>;
 export type JsonString = string & { __json__: true };
 export type StableJsonString = string & { __json__: true; __stable__: true };
 
-export function stringify(json: Json): StableJsonString | Error {
+export type SaveJson =
+  | (Json & "SaveJson")
+  | JsonPrimitive
+  | ReadonlyArray<JsonPrimitive>;
+
+export function isSaveJson(json: Json | JsonPrimitive): json is SaveJson {
+  try {
+    stableStringify(json);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export function stringify(json: SaveJson | JsonPrimitive): StableJsonString;
+export function stringify(json: Json | JsonPrimitive): StableJsonString | Error;
+export function stringify(
+  json: Json | JsonPrimitive
+): StableJsonString | Error {
   try {
     return stableStringify(json) as StableJsonString;
   } catch (e) {
@@ -27,7 +45,10 @@ export function stringify(json: Json): StableJsonString | Error {
  * @param json1
  * @returns
  */
-export function eq(json0: Json, json1: Json): boolean {
+export function eq(
+  json0: SaveJson | JsonPrimitive,
+  json1: SaveJson | JsonPrimitive
+): boolean {
   return stringify(json0) === stringify(json1);
 }
 
