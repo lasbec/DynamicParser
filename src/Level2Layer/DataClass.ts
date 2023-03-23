@@ -1,5 +1,6 @@
 import { SaveJson } from "../Level0Layer/Json";
 import { eq as jsonEq, stringify } from "../Level0Layer/Json";
+import { SortedArray, DefaultAsc, emptyArray } from "../Level0Layer/Array";
 
 export abstract class DataClass<Data extends SaveJson> {
   constructor(readonly data: Data) {}
@@ -14,7 +15,7 @@ export abstract class DataClass<Data extends SaveJson> {
 export class DataClassSet<Data extends SaveJson> {
   private constructor(
     private readonly _map: ReadonlyMap<string, DataClass<Data>>,
-    private readonly sortedKeys: ReadonlyArray<string>
+    private readonly sortedKeys: SortedArray<DefaultAsc<string>>
   ) {}
   idString() {
     return stringify(this.sortedKeys);
@@ -31,7 +32,7 @@ export class DataClassSet<Data extends SaveJson> {
   }
 
   static empty<Data extends SaveJson>() {
-    return new DataClassSet<Data>(new Map(), []);
+    return new DataClassSet<Data>(new Map(), emptyArray(DefaultAsc<string>()));
   }
 
   has(el: DataClass<Data>) {
@@ -41,6 +42,6 @@ export class DataClassSet<Data extends SaveJson> {
   add(el: DataClass<Data>) {
     const newMap = new Map(this._map);
     newMap.set(el.idString(), el);
-    return new DataClassSet(newMap, []);
+    return new DataClassSet(newMap, emptyArray(DefaultAsc<string>()));
   }
 }

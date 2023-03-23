@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { findBinary, DefaultAsc, SortedArray, sortArray } from "./Array";
+import {
+  findBinary,
+  DefaultAsc,
+  SortedArray,
+  sortArray,
+  findClosestIntexBinary,
+  emptyArray,
+} from "./Array";
 describe("SortedArray", () => {
   it("NumAsc", () => {
     const arr = [1, 5, 2, 4];
@@ -46,5 +53,71 @@ describe("SortedArray", () => {
 
     const sorted = sortArray(DefaultAsc<string>())(arr);
     expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(3);
+  });
+
+  it("binary search empty", () => {
+    const arr: string[] = [];
+
+    const sorted = sortArray(DefaultAsc<string>())(arr);
+    expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(null);
+  });
+
+  it("binary search one element fail", () => {
+    const arr: string[] = ["r"];
+
+    const sorted = sortArray(DefaultAsc<string>())(arr);
+    expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(null);
+  });
+
+  it("binary search one element succ", () => {
+    const arr: string[] = ["_"];
+
+    const sorted = sortArray(DefaultAsc<string>())(arr);
+    expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(0);
+  });
+
+  it("binary search tow elements fail", () => {
+    const arr: string[] = ["1", "2"];
+
+    const sorted = sortArray(DefaultAsc<string>())(arr);
+    expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(null);
+  });
+
+  it("sort tow elements", () => {
+    const arr: string[] = ["1", "2"];
+
+    const sorted = sortArray(DefaultAsc<string>())(arr);
+    expect(sorted).toEqual(["1", "2"]);
+  });
+
+  it("binary search succes on first", () => {
+    const arr: string[] = ["", "2", "654", "96"];
+
+    const sorted = sortArray(DefaultAsc<string>())(arr);
+    expect(findBinary(DefaultAsc<string>())(sorted)("")).toEqual(0);
+  });
+  it("binary search sucess on last", () => {
+    const arr: string[] = ["1", "65", "(", ""];
+
+    const sorted = sortArray(DefaultAsc<string>())(arr);
+    expect(findClosestIntexBinary(DefaultAsc<string>())(sorted)("65")).toEqual(
+      3
+    );
+  });
+
+  it("sort 4 elements", () => {
+    const arr: string[] = ["1", "65", "(", ""];
+
+    const sorted = sortArray(DefaultAsc<string>())(arr);
+    expect(sorted).toEqual(["", "(", "1", "65"]);
+  });
+
+  it("closest index simple", () => {
+    const arr = ["a", " ", "A", "_", "s", ""];
+
+    const sorted = sortArray(DefaultAsc<string>())(arr);
+    expect(findClosestIntexBinary(DefaultAsc<string>())(sorted)("_")).toEqual(
+      3
+    );
   });
 });

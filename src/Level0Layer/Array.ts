@@ -41,9 +41,43 @@ export function sortArray<C extends Comparison<any, any>>(comp: C) {
   };
 }
 
-export function findBinary<C extends Comparison<any, any>>(comp: C) {
+export function emptyArray<C extends Comparison<any, any>>(comp: C) {
+  return [] as unknown as SortedArray<C>;
+}
+
+export function sliceOf<C extends Comparison<any, any>>(arr: SortedArray<C>) {
+  return (start: number, end?: number) => {
+    return arr.slice(start, end) as unknown as SortedArray<C>;
+  };
+}
+
+export function insertBinary<C extends Comparison<any, any>>(comp: C) {
+  const compSet = findClosestIntexBinary(comp);
   return (arr: SortedArray<C>) => {
-    return (element: GetComparisonType<C>): number | undefined => {
+    const findIndex = compSet(arr);
+    return (element: GetComparisonType<C>): SortedArray<C> => {
+      const i = findIndex(element);
+      if (i === null) return [element] as unknown as SortedArray<C>;
+      return [
+        ...arr.slice(0, i),
+        element,
+        ...arr.slice(i),
+      ] as unknown as SortedArray<C>;
+    };
+  };
+}
+
+export function findClosestIntexBinary<C extends Comparison<any, any>>(
+  comp: C
+) {
+  return (arr: SortedArray<C>) => {
+    return (element: GetComparisonType<C>): number | null => {
+      if (arr.length === 0) {
+        return null;
+      }
+      if (arr.length === 1) {
+        return comp.compare(arr[0], element) === "left=right" ? 0 : null;
+      }
       const resultRange: [number, number] = [0, arr.length - 1];
       let middleIndex = Math.floor(resultRange[0] + resultRange[1] / 2);
       while (resultRange[0] < resultRange[1]) {
@@ -53,7 +87,9 @@ export function findBinary<C extends Comparison<any, any>>(comp: C) {
           return middleIndex;
         }
         if (middleIndex === resultRange[0] || middleIndex === resultRange[1]) {
-          return;
+          return comp.compare(arr[resultRange[1]], element) === "left=right"
+            ? resultRange[1]
+            : resultRange[0];
         }
         if (comparison === "left<right") {
           resultRange[0] = middleIndex;
@@ -70,6 +106,21 @@ export function findBinary<C extends Comparison<any, any>>(comp: C) {
       throw new Error(
         `Corrupt serach state: left=${resultRange[0]}, right=${resultRange[1]}, middle=${middleIndex}`
       );
+    };
+  };
+}
+
+export function findBinary<C extends Comparison<any, any>>(comp: C) {
+  const compSet = findClosestIntexBinary(comp);
+  return (arr: SortedArray<C>) => {
+    const findIndex = compSet(arr);
+    return (element: GetComparisonType<C>): number | null => {
+      const i = findIndex(element);
+      if (i === null) return null;
+      if (comp.compare(arr[i], element) === "left=right") {
+        return i;
+      }
+      return null;
     };
   };
 }
