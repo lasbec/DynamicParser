@@ -76,7 +76,7 @@ export function findClosestIntexBinary<C extends Comparison<any, any>>(
         return null;
       }
       if (arr.length === 1) {
-        return comp.compare(arr[0], element) === "left=right" ? 0 : null;
+        return 0;
       }
       const resultRange: [number, number] = [0, arr.length - 1];
       let middleIndex = Math.floor(resultRange[0] + resultRange[1] / 2);

@@ -6,6 +6,7 @@ import {
   sortArray,
   findClosestIntexBinary,
   emptyArray,
+  insertBinary,
 } from "./Array";
 describe("SortedArray", () => {
   it("NumAsc", () => {
@@ -96,7 +97,7 @@ describe("SortedArray", () => {
     const sorted = sortArray(DefaultAsc<string>())(arr);
     expect(findBinary(DefaultAsc<string>())(sorted)("")).toEqual(0);
   });
-  it("binary search sucess on last", () => {
+  it("binary closest with 4 elements", () => {
     const arr: string[] = ["1", "65", "(", ""];
 
     const sorted = sortArray(DefaultAsc<string>())(arr);
@@ -120,4 +121,39 @@ describe("SortedArray", () => {
       3
     );
   });
+
+  it("closest index one element", () => {
+    const arr = ["a"];
+
+    const sorted = sortArray(DefaultAsc<string>())(arr);
+    expect(findClosestIntexBinary(DefaultAsc<string>())(sorted)("b")).toEqual(
+      0
+    );
+  });
+
+  it("insert one", () => {
+    const start = emptyArray(DefaultAsc<string>());
+    const insert = insertBinary(DefaultAsc<string>());
+    const result = insert(start)("a");
+    expect(result).toEqual(["a"]);
+  });
+  it("insert tow", () => {
+    const start = emptyArray(DefaultAsc<string>());
+    const insert = insertBinary(DefaultAsc<string>());
+    const result = insert(insert(start)("a"))("b");
+    expect(result).toEqual(["b", "a"]);
+  });
+
+  for (const i of Array(10).fill(0)) {
+    it("PROPERTY: inserting one another should result in the same as sort", () => {
+      const arr: Array<number> = Array(i).fill(Math.random);
+      const insert = insertBinary(DefaultAsc<number>());
+      let resultByInsertion = emptyArray(DefaultAsc<number>());
+      for (const n of arr) {
+        resultByInsertion = insert(resultByInsertion)(n);
+      }
+      const resultBySorting = sortArray(DefaultAsc<number>())(arr);
+      expect(resultByInsertion).toEqual(resultBySorting);
+    });
+  }
 });
