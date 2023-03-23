@@ -1,10 +1,6 @@
 import { MetaSymbol, Production, Element } from "./Grammar";
 import { Json, StableJsonString } from "./Level0Layer/Json";
 
-function metaSymbolToString(symbol: MetaSymbol): boolean {
-  return symbol === Symbol("itren");
-}
-
 export class LR0Element implements Production {
   constructor(
     readonly production: Production,
