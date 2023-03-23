@@ -1,4 +1,4 @@
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { Char } from "./Level0Layer/Char";
 
 const A = Symbol("A");
@@ -13,5 +13,7 @@ const grammar = [
   { metaSymbol: A, result: [Char("a"), S, Char("b")] },
 ];
 describe("Clouser", () => {
-  it("should be defined", () => {});
+  it("should be defined", () => {
+    expect(1).toEqual(1);
+  });
 });

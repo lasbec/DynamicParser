@@ -2,14 +2,14 @@
 	"devDependencies": {
 		"prettier": "^2.8.4",
 		"typescript": "^5.0.2",
+		"vite": "^4.2.1",
 		"vitest": "^0.29.3"
 	},
 	"scripts": {
-		"test": "npx vitest ./test",
-		"build": "npx tsc"
+		"test": "pnpm exec vitest ./test",
+		"build": "pnpm exec tsc"
 	},
 	"dependencies": {
-		"@types": "link:lodash/@types",
-		"lodash": "^4.17.21"
+		"json-stable-stringify": "^1.0.2"
 	}
 }
