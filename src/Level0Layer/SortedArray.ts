@@ -39,6 +39,7 @@ export function isSorted<C extends Comparison<any, any>>(comp: C) {
     let previous: GetComparisonType<C> = arr[0];
     for (const el of arr.slice(1)) {
       if (comp.compare(previous, el) === "left>right") return false;
+      previous = el;
     }
     return true;
   };

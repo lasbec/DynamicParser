@@ -10,7 +10,10 @@ import {
   asSorted,
 } from "./SortedArray";
 import { range, shuffle, randomArray } from "./Array";
+import { isSorted } from "./SortedArray";
 describe("SortedArray", () => {
+  const asSortedNum = asSorted(DefaultAsc<number>());
+  const isSortedNum = isSorted(DefaultAsc<number>());
   it("NumAsc", () => {
     const arr = [1, 5, 2, 4];
 
@@ -139,6 +142,13 @@ describe("SortedArray", () => {
     expect(result).toEqual(["a", "b"]);
   });
 
+  it("isSorted false", () => {
+    expect(isSortedNum([1, 2, 4, 1])).toEqual(false);
+  });
+  it("isSorted true", () => {
+    expect(isSortedNum([1, 2, 4])).toEqual(true);
+  });
+
   it("insert five numbers", () => {
     const start = emptyArray(DefaultAsc<number>());
     const insert = insertBinary(DefaultAsc<number>());
@@ -148,7 +158,7 @@ describe("SortedArray", () => {
     expect(result).toEqual([-1, 1, 1, 5, 17]);
   });
   it("find index number 17", () => {
-    const start = asSorted(DefaultAsc<number>())([-1, 1, 1, 5]);
+    const start = asSortedNum([-1, 1, -1, 5]);
     const findClosest = findClosestIntexBinary(DefaultAsc<number>());
     const result = findClosest(start)(17);
     expect(result).toEqual([3, "left>right"]);
