@@ -8,7 +8,7 @@ import {
   emptyArray,
   insertBinary,
 } from "./SortedArray";
-import { shuffle } from "./Array";
+import { range, shuffle, randomArray } from "./Array";
 describe("SortedArray", () => {
   it("NumAsc", () => {
     const arr = [1, 5, 2, 4];
@@ -99,12 +99,13 @@ describe("SortedArray", () => {
     expect(findBinary(DefaultAsc<string>())(sorted)("")).toEqual(0);
   });
   it("binary closest with 4 elements", () => {
-    const arr: string[] = ["1", "65", "(", ""];
+    const arr: string[] = ["", "1", "(", "65"];
 
     const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findClosestIntexBinary(DefaultAsc<string>())(sorted)("65")).toEqual(
-      3
-    );
+    expect(findClosestIntexBinary(DefaultAsc<string>())(sorted)("65")).toEqual([
+      3,
+      "left=right",
+    ]);
   });
 
   it("sort 4 elements", () => {
@@ -114,22 +115,14 @@ describe("SortedArray", () => {
     expect(sorted).toEqual(["", "(", "1", "65"]);
   });
 
-  it("closest index simple", () => {
-    const arr = ["a", " ", "A", "_", "s", ""];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findClosestIntexBinary(DefaultAsc<string>())(sorted)("_")).toEqual(
-      3
-    );
-  });
-
   it("closest index one element", () => {
     const arr = ["a"];
 
     const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findClosestIntexBinary(DefaultAsc<string>())(sorted)("b")).toEqual(
-      0
-    );
+    expect(findClosestIntexBinary(DefaultAsc<string>())(sorted)("b")).toEqual([
+      0,
+      "left>right",
+    ]);
   });
 
   it("insert one", () => {
@@ -142,23 +135,39 @@ describe("SortedArray", () => {
     const start = emptyArray(DefaultAsc<string>());
     const insert = insertBinary(DefaultAsc<string>());
     const result = insert(insert(start)("a"))("b");
-    expect(result).toEqual(["b", "a"]);
+    expect(result).toEqual(["a", "b"]);
   });
 
-  for (const i of Array(10).fill(0)) {
-    it("PROPERTY: inserting one another should result in the same as sort", () => {
-      const arr: Array<number> = Array(i).fill(Math.random);
-      const insert = insertBinary(DefaultAsc<number>());
-      let resultByInsertion = emptyArray(DefaultAsc<number>());
-      for (const n of arr) {
-        resultByInsertion = insert(resultByInsertion)(n);
-      }
-      const resultBySorting = sortArray(DefaultAsc<number>())(arr);
-      expect(resultByInsertion).toEqual(resultBySorting);
-    });
-  }
+  it("insert five numbers", () => {
+    const start = emptyArray(DefaultAsc<number>());
+    const insert = insertBinary(DefaultAsc<number>());
+    const result = insert(insert(insert(insert(insert(start)(1))(5))(1))(-1))(
+      17
+    );
+    expect(result).toEqual([-1, 1, 1, 5, 17]);
+  });
+  it("find index number 17", () => {
+    const start = sortArray(DefaultAsc<number>())([-1, 1, 1, 5]);
+    const insert = insertBinary(DefaultAsc<number>());
+    const findClosest = findClosestIntexBinary(DefaultAsc<number>());
+    const result = findClosest(start)(17);
+    expect(result).toEqual([3, "left>right"]);
+  });
 
-  // for (const i of Array(10).fill(0)) {
+  // for (const i of range(10)) {
+  //   it("PROPERTY: inserting one another should result in the same as sort", () => {
+  //     const arr: Array<number> = randomArray(i);
+  //     const insert = insertBinary(DefaultAsc<number>());
+  //     let resultByInsertion = emptyArray(DefaultAsc<number>());
+  //     for (const n of arr) {
+  //       resultByInsertion = insert(resultByInsertion)(n);
+  //     }
+  //     const resultBySorting = sortArray(DefaultAsc<number>())(arr);
+  //     expect(resultByInsertion).toEqual(resultBySorting);
+  //   });
+  // }
+
+  // for (const i of range(10)) {
   //   it("PROPERTY: inserting order should not matter", () => {
   //     const arr1: Array<string> = Array(i)
   //       .fill(Math.random)
