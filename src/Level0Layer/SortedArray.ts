@@ -91,55 +91,47 @@ export function sliceOf<C extends Comparison<any, any>>(arr: SortedArray<C>) {
 }
 
 export function insertBinary<C extends Comparison<any, any>>(comp: C) {
-  const compSet = findClosestIndex(comp);
+  const compSet = findIndexNextSmaller(comp);
   return (arr: SortedArray<C>) => {
     const findIndex = compSet(arr);
     return (element: GetComparisonType<C>): SortedArray<C> => {
-      const result = findIndex(element);
-      if (result === null) return [element] as unknown as SortedArray<C>;
-      const [i, comp] = result;
-      return comp === "left>right"
-        ? ([
-            ...arr.slice(0, i + 1),
-            element,
-            ...arr.slice(i + 1),
-          ] as unknown as SortedArray<C>)
-        : ([
-            ...arr.slice(0, i),
-            element,
-            ...arr.slice(i),
-          ] as unknown as SortedArray<C>);
+      const indexOfNexSmallerEl = findIndex(element);
+      const i = indexOfNexSmallerEl === null ? 0 : indexOfNexSmallerEl + 1;
+      return [
+        ...arr.slice(0, i),
+        element,
+        ...arr.slice(i),
+      ] as unknown as SortedArray<C>;
     };
   };
 }
 
-export function findClosestIndex<C extends Comparison<any, any>>(comp: C) {
+export function findIndexNextSmaller<C extends Comparison<any, any>>(comp: C) {
   return (arr: SortedArray<C>) => {
-    return (element: GetComparisonType<C>): [number, CompareResult] | null => {
+    return (element: GetComparisonType<C>): number | null => {
       if (arr.length === 0) {
         return null;
       }
-      if (arr.length === 1) {
-        return [0, comp.compare(element, arr[0])];
-      }
+
       const resultRange: [number, number] = [0, arr.length - 1];
       let middleIndex = Math.floor(resultRange[0] + resultRange[1] / 2);
-      while (resultRange[0] < resultRange[1]) {
+      while (resultRange[0] <= resultRange[1]) {
         middleIndex = Math.floor((resultRange[0] + resultRange[1]) / 2);
-        const comparison = comp.compare(arr[middleIndex], element);
-        if (comparison === "left=right") {
-          return [middleIndex, "left=right"];
+        const comparison = comp.compare(element, arr[middleIndex]);
+        if (middleIndex === resultRange[0]) {
+          const compLeft = comparison;
+          const toTheLeftIsNoSmallerElement = compLeft !== "left>right";
+          if (toTheLeftIsNoSmallerElement) return null;
+          const compRight = comp.compare(element, arr[resultRange[1]]);
+          const toTheRightIsASmallerElement = compRight === "left>right";
+          if (toTheRightIsASmallerElement) return resultRange[1];
+          return resultRange[0];
         }
-        if (middleIndex === resultRange[0] || middleIndex === resultRange[1]) {
-          return comp.compare(arr[resultRange[1]], element) === "left=right"
-            ? [resultRange[1], "left=right"]
-            : [resultRange[0], comp.compare(element, resultRange[0])];
-        }
-        if (comparison === "left<right") {
+        if (comparison === "left>right") {
           resultRange[0] = middleIndex;
           continue;
         }
-        if (comparison === "left>right") {
+        if (comparison === "left=right" || comparison === "left<right") {
           resultRange[1] = middleIndex;
           continue;
         }
@@ -155,13 +147,14 @@ export function findClosestIndex<C extends Comparison<any, any>>(comp: C) {
 }
 
 export function findBinary<C extends Comparison<any, any>>(comp: C) {
-  const compSet = findClosestIndex(comp);
+  const compSet = findIndexNextSmaller(comp);
   return (arr: SortedArray<C>) => {
     const findIndex = compSet(arr);
     return (element: GetComparisonType<C>): number | null => {
-      const result = findIndex(element);
-      if (result === null) return null;
-      const [i, _] = result;
+      if (arr.length === 0) return null;
+      const indexOfNextSmallerEl = findIndex(element);
+      const i = indexOfNextSmallerEl === null ? 0 : indexOfNextSmallerEl + 1;
+      if (i === arr.length) return null;
       if (comp.compare(arr[i], element) === "left=right") {
         return i;
       }

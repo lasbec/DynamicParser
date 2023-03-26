@@ -4,7 +4,7 @@ import {
   DefaultAsc,
   SortedArray,
   sortArray,
-  findClosestIndex,
+  findIndexNextSmaller,
   emptyArray,
   insertBinary,
   asSorted,
@@ -14,6 +14,7 @@ import { isSorted } from "./SortedArray";
 describe("SortedArray", () => {
   const asSortedNum = asSorted(DefaultAsc<number>());
   const isSortedNum = isSorted(DefaultAsc<number>());
+  const asSortedStr = asSorted(DefaultAsc<string>());
   it("NumAsc", () => {
     const arr = [1, 5, 2, 4];
 
@@ -55,37 +56,27 @@ describe("SortedArray", () => {
   });
 
   it("binary search", () => {
-    const arr = ["a", " ", "A", "_", "s", ""];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
+    const sorted = asSortedStr(["", " ", "A", "_", "a", "s"]);
     expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(3);
   });
 
   it("binary search empty", () => {
-    const arr: string[] = [];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
+    const sorted = emptyArray(DefaultAsc<string>());
     expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(null);
   });
 
   it("binary search one element fail", () => {
-    const arr: string[] = ["r"];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
+    const sorted = asSortedStr(["r"]);
     expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(null);
   });
 
   it("binary search one element succ", () => {
-    const arr: string[] = ["_"];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
+    const sorted = asSortedStr(["_"]);
     expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(0);
   });
 
   it("binary search tow elements fail", () => {
-    const arr: string[] = ["1", "2"];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
+    const sorted = asSortedStr(["1", "2"]);
     expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(null);
   });
 
@@ -97,19 +88,14 @@ describe("SortedArray", () => {
   });
 
   it("binary search succes on first", () => {
-    const arr: string[] = ["", "2", "654", "96"];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
+    const sorted = asSortedStr(["", "2", "654", "96"]);
     expect(findBinary(DefaultAsc<string>())(sorted)("")).toEqual(0);
   });
   it("binary closest with 4 elements", () => {
     const arr: string[] = ["", "1", "(", "65"];
 
     const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findClosestIndex(DefaultAsc<string>())(sorted)("65")).toEqual([
-      3,
-      "left=right",
-    ]);
+    expect(findIndexNextSmaller(DefaultAsc<string>())(sorted)("65")).toEqual(2);
   });
 
   it("sort 4 elements", () => {
@@ -123,10 +109,7 @@ describe("SortedArray", () => {
     const arr = ["a"];
 
     const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findClosestIndex(DefaultAsc<string>())(sorted)("b")).toEqual([
-      0,
-      "left>right",
-    ]);
+    expect(findIndexNextSmaller(DefaultAsc<string>())(sorted)("b")).toEqual(0);
   });
 
   it("insert one", () => {
@@ -160,9 +143,9 @@ describe("SortedArray", () => {
 
   it("find index number 17", () => {
     const start = asSortedNum([-1, 1, 1, 5]);
-    const findClosest = findClosestIndex(DefaultAsc<number>());
+    const findClosest = findIndexNextSmaller(DefaultAsc<number>());
     const result = findClosest(start)(17);
-    expect(result).toEqual([3, "left>right"]);
+    expect(result).toEqual(3);
   });
 
   // for (const i of range(10)) {
