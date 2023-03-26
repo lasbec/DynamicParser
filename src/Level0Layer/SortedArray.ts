@@ -91,7 +91,7 @@ export function sliceOf<C extends Comparison<any, any>>(arr: SortedArray<C>) {
 }
 
 export function insertBinary<C extends Comparison<any, any>>(comp: C) {
-  const compSet = findClosestIntexBinary(comp);
+  const compSet = findClosestIndex(comp);
   return (arr: SortedArray<C>) => {
     const findIndex = compSet(arr);
     return (element: GetComparisonType<C>): SortedArray<C> => {
@@ -113,9 +113,7 @@ export function insertBinary<C extends Comparison<any, any>>(comp: C) {
   };
 }
 
-export function findClosestIntexBinary<C extends Comparison<any, any>>(
-  comp: C
-) {
+export function findClosestIndex<C extends Comparison<any, any>>(comp: C) {
   return (arr: SortedArray<C>) => {
     return (element: GetComparisonType<C>): [number, CompareResult] | null => {
       if (arr.length === 0) {
@@ -157,7 +155,7 @@ export function findClosestIntexBinary<C extends Comparison<any, any>>(
 }
 
 export function findBinary<C extends Comparison<any, any>>(comp: C) {
-  const compSet = findClosestIntexBinary(comp);
+  const compSet = findClosestIndex(comp);
   return (arr: SortedArray<C>) => {
     const findIndex = compSet(arr);
     return (element: GetComparisonType<C>): number | null => {
