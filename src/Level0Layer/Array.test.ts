@@ -1,159 +1,44 @@
-import { describe, expect, it } from "vitest";
-import {
-  findBinary,
-  DefaultAsc,
-  SortedArray,
-  sortArray,
-  findClosestIntexBinary,
-  emptyArray,
-  insertBinary,
-} from "./Array";
-describe("SortedArray", () => {
-  it("NumAsc", () => {
-    const arr = [1, 5, 2, 4];
+import { describe, it, expect } from "vitest";
+import { shuffle, popRandomElement, randomArray } from "./Array";
+import { getRandomInt } from "./Basics";
 
-    const sorted: SortedArray<DefaultAsc<number>> = sortArray(
-      DefaultAsc<number>()
-    )(arr);
-    const arr0: ReadonlyArray<number> = sorted;
-    const arr1: Array<number> = [...sorted];
-    // @ts-expect-error
-    const arr2: ReadonlyArray<string> = sorted;
-    expect(sorted).toEqual([1, 2, 4, 5]);
+describe("Shuffle", () => {
+  it("should return a new array", () => {
+    const arr = [1];
+    expect(shuffle(arr)).not.toBe(arr);
   });
-
-  it("LexAsc", () => {
-    const arr = ["a", " ", "A", "_", "s", ""];
-
-    const sorted: SortedArray<DefaultAsc> = sortArray(DefaultAsc())(arr);
-    // @ts-expect-error
-    const arr0: ReadonlyArray<number> = sorted;
-    const arr1: Array<number | string | bigint> = [...sorted];
-    // @ts-expect-error
-    const arr2: ReadonlyArray<string> = sorted;
-    expect(sorted).toEqual(["", " ", "A", "_", "a", "s"]);
+  it("should (with tremendous propability) return an unequal array", () => {
+    const arr = randomArray(10);
+    expect(shuffle(arr)).not.toEqual(arr);
   });
-
-  it("LexAsc 2", () => {
-    const arr = ["a", " ", "", "s", "_", "A"];
-
-    const sorted = sortArray(DefaultAsc())(arr);
-    expect(sorted).toEqual(["", " ", "A", "_", "a", "s"]);
+  it("should return an array with the same elements", () => {
+    const arr = randomArray(100);
+    for (const el of shuffle(arr)) {
+      expect(arr.includes(el)).toBeTruthy();
+    }
   });
-
-  it("Default comaparer 0", () => {
-    expect(DefaultAsc().compare("_", "_")).toEqual("left=right");
-  });
-
-  it("Default comaparer 1", () => {
-    expect(DefaultAsc().compare("_", "]")).toEqual("left>right");
-  });
-
-  it("binary search", () => {
-    const arr = ["a", " ", "A", "_", "s", ""];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(3);
-  });
-
-  it("binary search empty", () => {
-    const arr: string[] = [];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(null);
-  });
-
-  it("binary search one element fail", () => {
-    const arr: string[] = ["r"];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(null);
-  });
-
-  it("binary search one element succ", () => {
-    const arr: string[] = ["_"];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(0);
-  });
-
-  it("binary search tow elements fail", () => {
-    const arr: string[] = ["1", "2"];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findBinary(DefaultAsc<string>())(sorted)("_")).toEqual(null);
-  });
-
-  it("sort tow elements", () => {
-    const arr: string[] = ["1", "2"];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(sorted).toEqual(["1", "2"]);
-  });
-
-  it("binary search succes on first", () => {
-    const arr: string[] = ["", "2", "654", "96"];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findBinary(DefaultAsc<string>())(sorted)("")).toEqual(0);
-  });
-  it("binary closest with 4 elements", () => {
-    const arr: string[] = ["1", "65", "(", ""];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findClosestIntexBinary(DefaultAsc<string>())(sorted)("65")).toEqual(
-      3
-    );
-  });
-
-  it("sort 4 elements", () => {
-    const arr: string[] = ["1", "65", "(", ""];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(sorted).toEqual(["", "(", "1", "65"]);
-  });
-
-  it("closest index simple", () => {
-    const arr = ["a", " ", "A", "_", "s", ""];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findClosestIntexBinary(DefaultAsc<string>())(sorted)("_")).toEqual(
-      3
-    );
-  });
-
-  it("closest index one element", () => {
-    const arr = ["a"];
-
-    const sorted = sortArray(DefaultAsc<string>())(arr);
-    expect(findClosestIntexBinary(DefaultAsc<string>())(sorted)("b")).toEqual(
-      0
-    );
-  });
-
-  it("insert one", () => {
-    const start = emptyArray(DefaultAsc<string>());
-    const insert = insertBinary(DefaultAsc<string>());
-    const result = insert(start)("a");
-    expect(result).toEqual(["a"]);
-  });
-  it("insert tow", () => {
-    const start = emptyArray(DefaultAsc<string>());
-    const insert = insertBinary(DefaultAsc<string>());
-    const result = insert(insert(start)("a"))("b");
-    expect(result).toEqual(["b", "a"]);
-  });
-
-  for (const i of Array(10).fill(0)) {
-    it("PROPERTY: inserting one another should result in the same as sort", () => {
-      const arr: Array<number> = Array(i).fill(Math.random);
-      const insert = insertBinary(DefaultAsc<number>());
-      let resultByInsertion = emptyArray(DefaultAsc<number>());
-      for (const n of arr) {
-        resultByInsertion = insert(resultByInsertion)(n);
-      }
-      const resultBySorting = sortArray(DefaultAsc<number>())(arr);
-      expect(resultByInsertion).toEqual(resultBySorting);
+  for (const l of Array(10).fill(getRandomInt(0, 10))) {
+    it("should return an array of the same lenght", () => {
+      const arr = randomArray(l);
+      expect(shuffle(arr).length).toEqual(l);
     });
   }
+});
+
+describe("popRandomElement", () => {
+  it("should return an element from array", () => {
+    const arr: (number | undefined)[] = randomArray(10);
+    const cpy = [...arr];
+
+    const result = popRandomElement(cpy);
+    expect(arr.includes(result)).toBeTruthy();
+  });
+
+  it("should decrease array lenght by 1", () => {
+    const arr = randomArray(10);
+    const cpy = [...arr];
+
+    const result = popRandomElement(cpy);
+    expect(cpy.length).toEqual(9);
+  });
 });
