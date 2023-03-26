@@ -7,6 +7,7 @@ import {
   findClosestIntexBinary,
   emptyArray,
   insertBinary,
+  asSorted,
 } from "./SortedArray";
 import { range, shuffle, randomArray } from "./Array";
 describe("SortedArray", () => {
@@ -147,8 +148,7 @@ describe("SortedArray", () => {
     expect(result).toEqual([-1, 1, 1, 5, 17]);
   });
   it("find index number 17", () => {
-    const start = sortArray(DefaultAsc<number>())([-1, 1, 1, 5]);
-    const insert = insertBinary(DefaultAsc<number>());
+    const start = asSorted(DefaultAsc<number>())([-1, 1, 1, 5]);
     const findClosest = findClosestIntexBinary(DefaultAsc<number>());
     const result = findClosest(start)(17);
     expect(result).toEqual([3, "left>right"]);

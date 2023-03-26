@@ -1,4 +1,5 @@
 import { expect } from "vitest";
+import { escapeRegExp } from "../Level1Layer/Escaper";
 type CompareResult = "left<right" | "left=right" | "left>right";
 
 type Comparison<T, Name extends string> = {
@@ -31,6 +32,42 @@ type GetComparisonType<C extends Comparison<any, any>> = C extends Comparison<
 >
   ? T
   : never & "ERROR";
+
+export function isSorted<C extends Comparison<any, any>>(comp: C) {
+  return (arr: ReadonlyArray<GetComparisonType<C>>): arr is SortedArray<C> => {
+    if (!arr.length) return true;
+    let previous: GetComparisonType<C> = arr[0];
+    for (const el of arr.slice(1)) {
+      if (comp.compare(previous, el) === "left>right") return false;
+    }
+    return true;
+  };
+}
+
+export function assertSorted<C extends Comparison<any, any>>(comp: C) {
+  const checker = isSorted(comp);
+  return (
+    arr: ReadonlyArray<GetComparisonType<C>>,
+    errMsg?: string
+  ): asserts arr is SortedArray<C> => {
+    if (!checker(arr))
+      throw new Error(errMsg || `Expected array to be sorted.`);
+  };
+}
+
+export function asSorted<C extends Comparison<any, any>>(comp: C) {
+  const _assertSorted: (
+    arr: ReadonlyArray<GetComparisonType<C>>,
+    errMsg?: string
+  ) => asserts arr is SortedArray<C> = assertSorted(comp);
+  return (
+    arr: ReadonlyArray<GetComparisonType<C>>,
+    errMsg?: string
+  ): SortedArray<C> => {
+    _assertSorted(arr, errMsg);
+    return arr;
+  };
+}
 
 export function sortArray<C extends Comparison<any, any>>(comp: C) {
   return (arr: ReadonlyArray<GetComparisonType<C>>) => {
