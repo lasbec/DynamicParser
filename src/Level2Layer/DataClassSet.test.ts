@@ -3,10 +3,11 @@ import { DataClass } from "./DataClass";
 import { DataClassSet } from "./DataClassSet";
 import { range, randomArray, shuffle } from "../Level0Layer/Array";
 import { asSaveJson } from "../Level0Layer/Json";
+import { isPrimitive } from "../Level0Layer/Basics";
 describe("DataClassSet", () => {
   for (const len of range(10)) {
     it("PROPERTY: argument order shouldn't matter", () => {
-      const args = randomArray(len).map((n) => new DataClass<number>(n));
+      const args = randomArray(len).map((n) => new DataClass(n));
       const shuffeldArgs = shuffle(args);
       const s = DataClassSet.from(...args);
       const s2 = DataClassSet.from(...shuffeldArgs);

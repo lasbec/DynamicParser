@@ -1,11 +1,18 @@
 import { MetaSymbol, Production, Element } from "./Grammar";
 import { Json, StableJsonString } from "./Level0Layer/Json";
+import { DataClassSet } from "./Level2Layer/DataClassSet";
+import { DataClass } from "./Level2Layer/DataClass";
 
-export class LR0Element implements Production {
+export class LR0Element extends DataClass implements Production {
   constructor(
     readonly production: Production,
     readonly pointIndex: number = 0
-  ) {}
+  ) {
+    super({
+      ...production,
+      pointIndex,
+    });
+  }
   readonly metaSymbol = this.production.metaSymbol;
   readonly result = this.production.result;
 

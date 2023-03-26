@@ -1,11 +1,27 @@
-import { getRandomInt } from "./Level0Layer/Basics";
+import { getRandomInt, Primitive, isPrimitive } from "./Level0Layer/Basics";
 import { Char } from "./Level0Layer/Char";
+import { DataClass } from "./Level2Layer/DataClass";
 
-export const EOF = Symbol("End Of File");
+export const EOF = {
+  end_of_file: true,
+};
 export type EOF = typeof EOF;
+export function isEOF(x: Primitive | Record<string, any>): x is EOF {
+  return (
+    !isPrimitive(x) && Object.keys(x).length === 1 && x["end_of_file"] === true
+  );
+}
 
 export type Terminal = Char | EOF;
-export type MetaSymbol = symbol;
+export class MetaSymbol extends DataClass {
+  constructor(readonly name: string) {
+    super({ name });
+  }
+
+  toString() {
+    return this.name;
+  }
+}
 export type Element = Terminal | MetaSymbol;
 export type Grammar = ReadonlyArray<Production>;
 export type Production = {
@@ -28,19 +44,11 @@ function getRandomProduction(left: MetaSymbol, grammar: Grammar): Production {
   return result;
 }
 
-function getMetaSymbols(grammar: Grammar): Set<MetaSymbol> {
-  return new Set(grammar.map((p) => p.metaSymbol));
-}
-
-function isMetaSymbol(str: string, grammar: Grammar): boolean {
-  return getMetaSymbols(grammar).has(Symbol(str));
-}
-
 function randomStep(state: Element[], grammar: Grammar): Element[] {
-  const metaSymbolIndex = state.findIndex((e) => typeof e !== "string");
+  const metaSymbolIndex = state.findIndex((e) => e instanceof MetaSymbol);
   const prev = state.slice(0, metaSymbolIndex);
   const metaSymbol = state[metaSymbolIndex];
-  if (typeof metaSymbol === "string") throw new Error("tiaronirtan");
+  if (!(metaSymbol instanceof MetaSymbol)) throw new Error("tiaronirtan");
 
   const rest = state.slice(metaSymbolIndex + 1);
 

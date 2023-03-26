@@ -1,6 +1,7 @@
 import { Table } from "./Level1Layer/Table";
-import { EOF, Grammar, MetaSymbol, Terminal } from "./Grammar";
-import { charAt } from "./Level0Layer/Char";
+import { EOF, Grammar, MetaSymbol, Terminal, isEOF } from "./Grammar";
+import { charAt, Char } from "./Level0Layer/Char";
+import { notNullish } from "./Level0Layer/Basics";
 
 type Result =
   | {
@@ -11,10 +12,67 @@ type Result =
       reason: string;
     };
 
+export class JumpingTable {
+  static empty(): JumpingTable {
+    return new JumpingTable(Table.empty());
+  }
+
+  private constructor(private table: Table<number>) {}
+
+  set(metaSymbol: MetaSymbol, state: number, newState: number) {
+    return new JumpingTable(
+      this.table.set(metaSymbol.idString(), state, newState)
+    );
+  }
+
+  setRow(rowKey: number, row: [MetaSymbol, number][]) {
+    return new JumpingTable(
+      this.table.setRow(
+        rowKey,
+        row.map(([ms, s]) => [ms.idString(), s])
+      )
+    );
+  }
+
+  get(metaSymbol: MetaSymbol, state: number) {
+    return this.table.get(metaSymbol.idString(), state);
+  }
+}
+
+export class ActionTable {
+  private constructor(
+    private table = Table.empty<Action>(),
+    private eofMap = new Map<number, Action>()
+  ) {}
+
+  static empty() {
+    return new ActionTable();
+  }
+
+  get(terminal: Terminal, state: number) {
+    if (isEOF(terminal)) return this.eofMap.get(state);
+    return this.table.get(terminal, state);
+  }
+
+  setRow(rowKey: number, row: [Terminal, Action][]) {
+    const table = this.table.setRow(
+      rowKey,
+      row
+        .map(([t, a]): [Char, Action] | null => (isEOF(t) ? null : [t, a]))
+        .filter(notNullish)
+    );
+
+    const eofEntry = row.find(([t, a]) => isEOF(t));
+    const eofMap = new Map(this.eofMap);
+    if (eofEntry) eofMap.set(rowKey, eofEntry[1]);
+    return new ActionTable(table, eofMap);
+  }
+}
+
 export class ShiftReduceMachine {
   constructor(
-    readonly actions: Table<Action, Terminal>,
-    readonly jumpingTable: Table<number, MetaSymbol>,
+    readonly actions: ActionTable,
+    readonly jumpingTable: JumpingTable,
     readonly grammar: Grammar
   ) {}
 

@@ -8,7 +8,8 @@ import {
   shift,
 } from "./ShiftReduceMachine";
 import { Char } from "./Level0Layer/Char";
-import { EOF, Terminal } from "./Grammar";
+import { EOF, Terminal, MetaSymbol } from "./Grammar";
+import { ActionTable, JumpingTable } from "./ShiftReduceMachine";
 
 /*
  * Example Grammar:
@@ -20,7 +21,7 @@ import { EOF, Terminal } from "./Grammar";
  *5 A ::= aSb
  */
 describe("ByScript", () => {
-  const actionTable = Table.empty<Action, Terminal>()
+  const actionTable = ActionTable.empty()
     .setRow(0, [[Char("b"), shift(3)]])
     .setRow(1, [
       [Char("b"), shift(2)],
@@ -53,10 +54,10 @@ describe("ByScript", () => {
       [EOF, reduce(1)],
     ]);
 
-  const A = Symbol("A");
-  const S = Symbol("S");
-  const Z = Symbol("Z");
-  const jumpingTable = Table.empty<number, symbol>()
+  const A = new MetaSymbol("A");
+  const S = new MetaSymbol("S");
+  const Z = new MetaSymbol("Z");
+  const jumpingTable = JumpingTable.empty()
     .set(A, 3, 4)
     .set(S, 0, 1)
     .set(S, 6, 7);

@@ -10,7 +10,7 @@ import { DataClass } from "./DataClass";
 
 export class DataClassSet<Data extends SaveJson> {
   private constructor(
-    private readonly _map: ReadonlyMap<string, DataClass<Data>>,
+    private readonly _map: ReadonlyMap<string, DataClass>,
     private readonly sortedKeys: SortedArray<DefaultAsc<string>>
   ) {}
   readonly length = this.sortedKeys.length;
@@ -22,9 +22,7 @@ export class DataClassSet<Data extends SaveJson> {
     return this.idString() === other.idString();
   }
 
-  static from<Data extends SaveJson>(
-    ...elements: ReadonlyArray<DataClass<Data>>
-  ) {
+  static from<Data extends SaveJson>(...elements: ReadonlyArray<DataClass>) {
     let result = DataClassSet.empty<Data>();
     for (const el of elements) {
       result = result.add(el);
@@ -36,11 +34,11 @@ export class DataClassSet<Data extends SaveJson> {
     return new DataClassSet<Data>(new Map(), emptyArray(DefaultAsc<string>()));
   }
 
-  has(el: DataClass<Data>) {
+  has(el: DataClass) {
     return this._map.has(el.idString());
   }
 
-  add(el: DataClass<Data>) {
+  add(el: DataClass) {
     const newMap = new Map(this._map);
     newMap.set(el.idString(), el);
     const newKeys = this._map.has(el.idString())

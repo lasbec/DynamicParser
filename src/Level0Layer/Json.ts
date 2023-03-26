@@ -15,7 +15,8 @@ export type StableJsonString = string & { __json__: true; __stable__: true };
 export type SaveJson =
   | (Json & "SaveJson")
   | JsonPrimitive
-  | ReadonlyArray<JsonPrimitive>;
+  | ReadonlyArray<SaveJson>
+  | { readonly [key in string]?: SaveJson };
 
 export function isSaveJson(json: Json | JsonPrimitive): json is SaveJson {
   try {
