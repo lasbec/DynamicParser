@@ -26,6 +26,22 @@ export function isSaveJson(json: Json | JsonPrimitive): json is SaveJson {
   }
 }
 
+export function assertSaveJson(
+  json: Json | JsonPrimitive,
+  errMsg?: string
+): asserts json is SaveJson {
+  if (!isSaveJson)
+    throw new Error(errMsg || "Expected JSON to be save for stringification.");
+}
+
+export function asSaveJson(
+  json: Json | JsonPrimitive,
+  errMsg?: string
+): SaveJson {
+  assertSaveJson(json, errMsg);
+  return json;
+}
+
 export function stringify(json: SaveJson | JsonPrimitive): StableJsonString;
 export function stringify(json: Json | JsonPrimitive): StableJsonString | Error;
 export function stringify(

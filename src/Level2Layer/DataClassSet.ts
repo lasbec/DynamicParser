@@ -13,6 +13,7 @@ export class DataClassSet<Data extends SaveJson> {
     private readonly _map: ReadonlyMap<string, DataClass<Data>>,
     private readonly sortedKeys: SortedArray<DefaultAsc<string>>
   ) {}
+  readonly length = this.sortedKeys.length;
   idString(): string {
     return stringify(this.sortedKeys);
   }
@@ -42,9 +43,9 @@ export class DataClassSet<Data extends SaveJson> {
   add(el: DataClass<Data>) {
     const newMap = new Map(this._map);
     newMap.set(el.idString(), el);
-    return new DataClassSet(
-      newMap,
-      insertBinary(DefaultAsc<string>())(this.sortedKeys)(el.idString())
-    );
+    const newKeys = this._map.has(el.idString())
+      ? this.sortedKeys
+      : insertBinary(DefaultAsc<string>())(this.sortedKeys)(el.idString());
+    return new DataClassSet(newMap, newKeys);
   }
 }
