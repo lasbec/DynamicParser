@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Table } from "./Level1Layer/Table";
 import {
-  Action,
   ShiftReduceMachine,
   accept,
   reduce,

@@ -1,6 +1,7 @@
 import { getRandomInt, Primitive, isPrimitive } from "./Level0Layer/Basics";
 import { Char } from "./Level0Layer/Char";
 import { DataClass } from "./Level2Layer/DataClass";
+import { DataClassSet } from "./Level2Layer/DataClassSet";
 
 export const EOF = {
   end_of_file: true,
@@ -42,6 +43,13 @@ function getRandomProduction(left: MetaSymbol, grammar: Grammar): Production {
         .join(",")}]; index= ${index}.`
     );
   return result;
+}
+
+export function getProductionsWithMetaSymbol(
+  grammar: Grammar,
+  metaSymbol: MetaSymbol
+): Production[] {
+  return grammar.filter((prod) => prod.metaSymbol.eq(metaSymbol));
 }
 
 function randomStep(state: Element[], grammar: Grammar): Element[] {

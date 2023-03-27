@@ -1,3 +1,4 @@
+import { o } from "vitest/dist/types-5872e574";
 import { SaveJson } from "../Level0Layer/Json";
 import { stringify } from "../Level0Layer/Json";
 import {
@@ -8,9 +9,9 @@ import {
 } from "../Level0Layer/SortedArray";
 import { DataClass } from "./DataClass";
 
-export class DataClassSet<Data extends SaveJson> {
+export class DataClassSet<T extends DataClass> {
   private constructor(
-    private readonly _map: ReadonlyMap<string, DataClass>,
+    private readonly _map: ReadonlyMap<string, T>,
     private readonly sortedKeys: SortedArray<DefaultAsc<string>>
   ) {}
   readonly length = this.sortedKeys.length;
@@ -18,27 +19,59 @@ export class DataClassSet<Data extends SaveJson> {
     return stringify(this.sortedKeys);
   }
 
-  eq(other: DataClassSet<Data>): boolean {
+  eq(other: DataClassSet<T>): boolean {
     return this.idString() === other.idString();
   }
 
-  static from<Data extends SaveJson>(...elements: ReadonlyArray<DataClass>) {
-    let result = DataClassSet.empty<Data>();
+  neq(other: DataClassSet<T>): boolean {
+    return !this.eq(other);
+  }
+
+  static from<T extends DataClass>(...elements: ReadonlyArray<T>) {
+    let result = DataClassSet.empty<T>();
     for (const el of elements) {
       result = result.add(el);
     }
     return result;
   }
 
-  static empty<Data extends SaveJson>() {
-    return new DataClassSet<Data>(new Map(), emptyArray(DefaultAsc<string>()));
+  static empty<T extends DataClass>() {
+    return new DataClassSet<T>(new Map(), emptyArray(DefaultAsc<string>()));
   }
 
-  has(el: DataClass) {
+  find(predicate: (el: T) => boolean): T | null {
+    for (const val of this._map.values()) {
+      if (predicate(val)) return val;
+    }
+    return null;
+  }
+
+  findAll(predicate: (el: T) => boolean): DataClassSet<T> {
+    let result = DataClassSet.empty<T>();
+    for (const val of this._map.values()) {
+      if (predicate(val)) {
+        result = result.add(val);
+      }
+    }
+    return result;
+  }
+
+  has(el: T | ((e: T) => boolean)): boolean {
+    if (typeof el === "function") {
+      return !!this.find(el);
+    }
     return this._map.has(el.idString());
   }
 
-  add(el: DataClass) {
+  add(...els: T[]): DataClassSet<T> {
+    let result: DataClassSet<T> = this;
+    for (const e of els) {
+      result = result.addOneElement(e);
+    }
+    return result;
+  }
+
+  private addOneElement(el: T): DataClassSet<T> {
     const newMap = new Map(this._map);
     newMap.set(el.idString(), el);
     const newKeys = this._map.has(el.idString())

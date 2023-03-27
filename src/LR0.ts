@@ -1,7 +1,6 @@
-import { MetaSymbol, Production, Element } from "./Grammar";
-import { Json, StableJsonString } from "./Level0Layer/Json";
-import { DataClassSet } from "./Level2Layer/DataClassSet";
+import { Production, Element, MetaSymbol } from "./Grammar";
 import { DataClass } from "./Level2Layer/DataClass";
+import { N } from "vitest/dist/types-5872e574";
 
 export class LR0Element extends DataClass implements Production {
   constructor(
@@ -15,6 +14,15 @@ export class LR0Element extends DataClass implements Production {
   }
   readonly metaSymbol = this.production.metaSymbol;
   readonly result = this.production.result;
+
+  symbolRightFromPoint(): Element | null {
+    return this.rightFromPoint()[0];
+  }
+
+  metaSymbolToTheRightFromPoint(): MetaSymbol | null {
+    const candidate = this.symbolRightFromPoint();
+    return candidate instanceof MetaSymbol ? candidate : null;
+  }
 
   leftFromPoint(): ReadonlyArray<Element> {
     return this.result.slice(0, this.pointIndex);
