@@ -1,7 +1,6 @@
 import { Table } from "./Level1Layer/Table";
-import { EOF, Grammar, MetaSymbol, Terminal, isEOF } from "./Grammar";
-import { charAt, Char } from "./Level0Layer/Char";
-import { notNullish } from "./Level0Layer/Basics";
+import { T, EOF, Grammar, MetaSymbol, Terminal } from "./Grammar";
+import { charAt } from "./Level0Layer/Char";
 
 type Result =
   | {
@@ -40,32 +39,23 @@ export class JumpingTable {
 }
 
 export class ActionTable {
-  private constructor(
-    private table = Table.empty<Action>(),
-    private eofMap = new Map<number, Action>()
-  ) {}
+  private constructor(private table = Table.empty<Action>()) {}
 
   static empty() {
     return new ActionTable();
   }
 
   get(terminal: Terminal, state: number) {
-    if (isEOF(terminal)) return this.eofMap.get(state);
-    return this.table.get(terminal, state);
+    return this.table.get(terminal.idString(), state);
   }
 
   setRow(rowKey: number, row: [Terminal, Action][]) {
-    const table = this.table.setRow(
-      rowKey,
-      row
-        .map(([t, a]): [Char, Action] | null => (isEOF(t) ? null : [t, a]))
-        .filter(notNullish)
+    return new ActionTable(
+      this.table.setRow(
+        rowKey,
+        row.map(([t, s]) => [t.idString(), s])
+      )
     );
-
-    const eofEntry = row.find(([t, a]) => isEOF(t));
-    const eofMap = new Map(this.eofMap);
-    if (eofEntry) eofMap.set(rowKey, eofEntry[1]);
-    return new ActionTable(table, eofMap);
   }
 }
 
@@ -110,18 +100,18 @@ class ShiftReduceExecution extends ShiftReduceMachine {
   }
 
   private peekChar(): Terminal {
-    return charAt(this.input, 0) || EOF;
+    return T(charAt(this.input, 0));
   }
 
   private consumeChar(): Terminal {
     const result = this.peekChar();
     this.input = this.input.slice(1);
-    if (result === "\n") {
+    if (result.id === "\n") {
       this.charCounter = 0;
       this.lineCounter += 1;
       // On windows lineendings we need to await till
       // carriage return is over till we keep on counting characters.
-    } else if (result !== "\r") {
+    } else if (result.id !== "\r") {
       this.charCounter += 1;
     }
     return result;

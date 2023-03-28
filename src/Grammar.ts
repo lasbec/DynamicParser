@@ -3,17 +3,20 @@ import { Char } from "./Level0Layer/Char";
 import { DataClass } from "./Level2Layer/DataClass";
 import { DataClassSet } from "./Level2Layer/DataClassSet";
 
-export const EOF = {
-  end_of_file: true,
-};
-export type EOF = typeof EOF;
-export function isEOF(x: Primitive | Record<string, any>): x is EOF {
-  return (
-    !isPrimitive(x) && Object.keys(x).length === 1 && x["end_of_file"] === true
-  );
-}
+export class Terminal extends DataClass {
+  constructor(readonly id?: Char) {
+    super(id || { end_of_file: true });
+  }
 
-export type Terminal = Char | EOF;
+  isEOF(): this is Terminal & { id: undefined } {
+    return this.id === undefined;
+  }
+}
+export function T(s?: string): Terminal {
+  return new Terminal(typeof s === "string" ? Char(s) : s);
+}
+export const EOF = T();
+
 export class MetaSymbol extends DataClass {
   constructor(readonly name: string) {
     super({ name });
