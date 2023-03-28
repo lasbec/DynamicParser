@@ -3,7 +3,9 @@ import { Char } from "./Level0Layer/Char";
 import { DataClass } from "./Level2Layer/DataClass";
 import { DataClassSet } from "./Level2Layer/DataClassSet";
 
-export class Terminal extends DataClass<Terminal> {
+export abstract class ProductionElement extends DataClass<ProductionElement> {}
+
+export class Terminal extends ProductionElement {
   constructor(readonly id?: Char) {
     super(id || { end_of_file: true });
   }
@@ -17,7 +19,7 @@ export function T(s?: string): Terminal {
 }
 export const EOF = T();
 
-export class MetaSymbol extends DataClass<MetaSymbol> {
+export class MetaSymbol extends ProductionElement {
   constructor(readonly name: string) {
     super({ name });
   }
@@ -26,7 +28,6 @@ export class MetaSymbol extends DataClass<MetaSymbol> {
     return this.name;
   }
 }
-export type Element = Terminal | MetaSymbol;
 export type Grammar = ReadonlyArray<Production>;
 export type Production = {
   readonly metaSymbol: MetaSymbol;
@@ -55,7 +56,10 @@ export function getProductionsWithMetaSymbol(
   return grammar.filter((prod) => prod.metaSymbol.eq(metaSymbol));
 }
 
-function randomStep(state: Element[], grammar: Grammar): Element[] {
+function randomStep(
+  state: ProductionElement[],
+  grammar: Grammar
+): ProductionElement[] {
   const metaSymbolIndex = state.findIndex((e) => e instanceof MetaSymbol);
   const prev = state.slice(0, metaSymbolIndex);
   const metaSymbol = state[metaSymbolIndex];
@@ -72,7 +76,7 @@ export function generateRandomWord(
   state: MetaSymbol,
   grammar: Grammar
 ): string {
-  let result: Element[] = [state];
+  let result: ProductionElement[] = [state];
   while (result.some((e) => typeof e !== "string")) {
     result = randomStep(result, grammar);
   }
