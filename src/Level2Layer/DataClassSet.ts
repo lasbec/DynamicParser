@@ -69,6 +69,10 @@ export class DataClassSet<T extends DataClass<T>> {
     return result;
   }
 
+  map<Z extends DataClass<Z>>(fn: (el: T) => Z): DataClassSet<Z> {
+    return DataClassSet.from(...[...this._map.values()].map(fn));
+  }
+
   private addOneElement(el: T): DataClassSet<T> {
     const newMap = new Map(this._map);
     newMap.set(el.idString(), el);

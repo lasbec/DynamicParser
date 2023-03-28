@@ -18,6 +18,14 @@ export class LR0Element extends DataClass<LR0Element> implements Production {
     return this.rightFromPoint()[0];
   }
 
+  shiftPointOneRight(): LR0Element {
+    return new LR0Element(this.production, this.pointIndex + 1);
+  }
+
+  static shiftPointOneRight(lr0: LR0Element): LR0Element {
+    return lr0.shiftPointOneRight();
+  }
+
   metaSymbolToTheRightFromPoint(): MetaSymbol | null {
     const candidate = this.symbolRightFromPoint();
     return candidate instanceof MetaSymbol ? candidate : null;
