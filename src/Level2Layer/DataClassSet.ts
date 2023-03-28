@@ -1,4 +1,4 @@
-import { stringify } from "../Level0Layer/Json";
+import { stringify, StableJsonString } from "../Level0Layer/Json";
 import {
   SortedArray,
   DefaultAsc,
@@ -7,13 +7,17 @@ import {
 } from "../Level0Layer/SortedArray";
 import { DataClass } from "./DataClass";
 
-export class DataClassSet<T extends DataClass<T>> {
+export class DataClassSet<T extends DataClass<T>> extends DataClass<
+  DataClassSet<T>
+> {
   private constructor(
     private readonly _map: ReadonlyMap<string, T>,
     private readonly sortedKeys: SortedArray<DefaultAsc<string>>
-  ) {}
+  ) {
+    super(sortedKeys);
+  }
   readonly length = this.sortedKeys.length;
-  idString(): string {
+  idString(): StableJsonString {
     return stringify(this.sortedKeys);
   }
 
