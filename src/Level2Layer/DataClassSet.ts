@@ -7,7 +7,7 @@ import {
 } from "../Level0Layer/SortedArray";
 import { DataClass } from "./DataClass";
 
-export class DataClassSet<T extends DataClass> {
+export class DataClassSet<T extends DataClass<T>> {
   private constructor(
     private readonly _map: ReadonlyMap<string, T>,
     private readonly sortedKeys: SortedArray<DefaultAsc<string>>
@@ -25,7 +25,7 @@ export class DataClassSet<T extends DataClass> {
     return !this.eq(other);
   }
 
-  static from<T extends DataClass>(...elements: ReadonlyArray<T>) {
+  static from<T extends DataClass<T>>(...elements: ReadonlyArray<T>) {
     let result = DataClassSet.empty<T>();
     for (const el of elements) {
       result = result.add(el);
@@ -33,7 +33,7 @@ export class DataClassSet<T extends DataClass> {
     return result;
   }
 
-  static empty<T extends DataClass>() {
+  static empty<T extends DataClass<T>>() {
     return new DataClassSet<T>(new Map(), emptyArray(DefaultAsc<string>()));
   }
 

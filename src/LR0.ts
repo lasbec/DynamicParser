@@ -1,8 +1,7 @@
 import { Production, Element, MetaSymbol } from "./Grammar";
 import { DataClass } from "./Level2Layer/DataClass";
-import { N } from "vitest/dist/types-5872e574";
 
-export class LR0Element extends DataClass implements Production {
+export class LR0Element extends DataClass<LR0Element> implements Production {
   constructor(
     readonly production: Production,
     readonly pointIndex: number = 0

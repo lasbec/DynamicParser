@@ -3,7 +3,7 @@ import { Char } from "./Level0Layer/Char";
 import { DataClass } from "./Level2Layer/DataClass";
 import { DataClassSet } from "./Level2Layer/DataClassSet";
 
-export class Terminal extends DataClass {
+export class Terminal extends DataClass<Terminal> {
   constructor(readonly id?: Char) {
     super(id || { end_of_file: true });
   }
@@ -17,7 +17,7 @@ export function T(s?: string): Terminal {
 }
 export const EOF = T();
 
-export class MetaSymbol extends DataClass {
+export class MetaSymbol extends DataClass<MetaSymbol> {
   constructor(readonly name: string) {
     super({ name });
   }

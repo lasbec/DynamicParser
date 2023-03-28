@@ -3,11 +3,11 @@ import { SaveJson, Json, asSaveJson, JsonPrimitive } from "../Level0Layer/Json";
 import { eq as jsonEq, stringify } from "../Level0Layer/Json";
 import { mapVal } from "../Level0Layer/Record";
 
-type Data = DataObject | DataArray | DataClass | JsonPrimitive;
+type Data = DataObject | DataArray | DataClass<any> | JsonPrimitive;
 type DataObject = { readonly [key in string]?: Data };
 type DataArray = ReadonlyArray<Data>;
 
-export class DataClass {
+export class DataClass<Self extends DataClass<Self>> {
   constructor(readonly data: Data) {}
   readonly json = DataClass.toJson(this.data);
 
@@ -26,7 +26,7 @@ export class DataClass {
     });
   }
 
-  eq(other: DataClass) {
+  eq(other: Self) {
     return jsonEq(this.json, other.json);
   }
   idString() {
